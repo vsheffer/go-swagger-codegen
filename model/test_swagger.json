@@ -1,0 +1,83 @@
+{
+	"host": "api.blackhawknetwork.com",
+	"info": {
+		"contact": {
+			"name":"vince.sheffer@bhnetwork.com"
+		},
+		"description":"This is my descripton",
+		"license": {
+			"name":"Proprietary"
+		},
+		"termsOfService":"http://blackhawknetwork.com",
+		"title":"Swagger Petstore Example",
+		"version":"1.0.0"
+	},
+    "basePath": "/v2",
+    "definitions": {
+        "Category": {
+            "properties": {
+                "id": {
+                    "format": "int64",
+                    "type": "integer",
+                    "xml": {
+                        "name": "id"
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "xml": {
+                        "name": "name"
+                    }
+                }
+            },
+            "xml": {
+                "name": "Category"
+            }
+        },
+        "Order": {
+            "properties": {
+                "complete": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "format": "int64",
+                    "type": "integer",
+                    "xml": {
+                        "name": "id"
+                    }
+                },
+                "petId": {
+                    "format": "int64",
+                    "type": "integer",
+                    "xml": {
+                        "name": "petId"
+                    }
+                },
+                "quantity": {
+                    "format": "int32",
+                    "type": "integer",
+                    "xml": {
+                        "name": "quantity"
+                    }
+                },
+                "shipDate": {
+                    "format": "date-time",
+                    "type": "string",
+                    "xml": {
+                        "name": "shipDate"
+                    }
+                },
+                "status": {
+                    "description": "Order Status",
+                    "type": "string",
+                    "xml": {
+                        "name": "status"
+                    }
+                }
+            },
+            "xml": {
+                "name": "Order"
+            }
+        }
+	}
+}

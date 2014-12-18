@@ -38,74 +38,16 @@ var (
 	}
 )
 
-func isValidValue(value string, validValues []string) bool {
-	for i := 0; i < len(validValues); i++ {
-		if value == validValues[i] {
-			return true
-		}
-	}
-	return false
-}
-
-func validScheme(v interface{}, param string) error {
-	st := reflect.ValueOf(v)
-	switch st.Kind() {
-	case reflect.String:
-		if isValidValue(st.String(), validSchemes) {
-			return nil
-		}
-		return fmt.Errorf("Invalid url scheme: '%s'", st.String())
-	case reflect.Slice:
-		var badSchemes []string
-		for i := 0; i < st.Len(); i++ {
-			value := st.Index(i).String()
-			if !isValidValue(value, validSchemes) {
-				badSchemes = append(badSchemes, value)
-			}
-		}
-
-		if len(badSchemes) > 0 {
-			return fmt.Errorf("Invalid schemes: [%s]", strings.Join(badSchemes, ","))
-		}
-		return nil
-	}
-	return errors.New("validScheme only validates slices of strings or strings.")
-}
-
-func validFormat(v interface{}, param string) error {
-	st := reflect.ValueOf(v)
-	switch st.Kind() {
-	case reflect.String:
-		if isValidValue(st.String(), validFormats) {
-			return nil
-		}
-		return fmt.Errorf("Invalid type format: '%s'", st.String())
-	}
-	return errors.New("validFormat only validates slices of strings or strings.")
-}
-
-func validType(v interface{}, param string) error {
-	st := reflect.ValueOf(v)
-	switch st.Kind() {
-	case reflect.String:
-		if isValidValue(st.String(), validTypes) {
-			return nil
-		}
-		return fmt.Errorf("Invalid parameter type: '%s'", st.String())
-	}
-	return errors.New("validFormat only validates slices of strings or strings.")
-}
-
 type Swagger struct {
-	Swagger     string              `json:"swagger" validate:"nonzero"`
-	Info        *Info               `json:"info"`
-	Host        string              `json:"host"`
-	BasePath    string              `json:"basePath"`
-	Schemes     []string            `json:"schemes"`
-	Consumes    []string            `json:"consumes"`
-	Produces    []string            `json:"produces"`
-	Paths       []map[string]Paths  `json:"path" validate:"nonzero"`
-	Definitions []map[string]Schema `json:"definitions"`
+	Swagger     string            `json:"swagger" validate:"nonzero"`
+	Info        *Info             `json:"info"`
+	Host        string            `json:"host"`
+	BasePath    string            `json:"basePath"`
+	Schemes     []string          `json:"schemes"`
+	Consumes    []string          `json:"consumes"`
+	Produces    []string          `json:"produces"`
+	Paths       map[string]Paths  `json:"path" validate:"nonzero"`
+	Definitions map[string]Schema `json:"definitions"`
 }
 
 type Info struct {
@@ -180,9 +122,67 @@ type ExternalDocumentation struct {
 	Url         string `json:"url" validate:"nonzero"`
 }
 
+func isValidValue(value string, validValues []string) bool {
+	for i := 0; i < len(validValues); i++ {
+		if value == validValues[i] {
+			return true
+		}
+	}
+	return false
+}
+
+func validScheme(v interface{}, param string) error {
+	st := reflect.ValueOf(v)
+	switch st.Kind() {
+	case reflect.String:
+		if isValidValue(st.String(), validSchemes) {
+			return nil
+		}
+		return fmt.Errorf("Invalid url scheme: '%s'", st.String())
+	case reflect.Slice:
+		var badSchemes []string
+		for i := 0; i < st.Len(); i++ {
+			value := st.Index(i).String()
+			if !isValidValue(value, validSchemes) {
+				badSchemes = append(badSchemes, value)
+			}
+		}
+
+		if len(badSchemes) > 0 {
+			return fmt.Errorf("Invalid schemes: [%s]", strings.Join(badSchemes, ","))
+		}
+		return nil
+	}
+	return errors.New("validScheme only validates slices of strings or strings.")
+}
+
+func validFormat(v interface{}, param string) error {
+	st := reflect.ValueOf(v)
+	switch st.Kind() {
+	case reflect.String:
+		if isValidValue(st.String(), validFormats) {
+			return nil
+		}
+		return fmt.Errorf("Invalid type format: '%s'", st.String())
+	}
+	return errors.New("validFormat only validates slices of strings or strings.")
+}
+
+func validType(v interface{}, param string) error {
+	st := reflect.ValueOf(v)
+	switch st.Kind() {
+	case reflect.String:
+		if isValidValue(st.String(), validTypes) {
+			return nil
+		}
+		return fmt.Errorf("Invalid parameter type: '%s'", st.String())
+	}
+	return errors.New("validFormat only validates slices of strings or strings.")
+}
+
 func NewSwagger(jsonBytes []byte) (*Swagger, error) {
-	var swagger *Swagger
-	err := json.Unmarshal(jsonBytes, swagger)
+	var swagger Swagger
+	err := json.Unmarshal(jsonBytes, &swagger)
 	if err != nil {
 		return nil, err
 	}
@@ -197,5 +197,5 @@ func NewSwagger(jsonBytes []byte) (*Swagger, error) {
 		return nil, err
 	}
 
-	return swagger, nil
+	return &swagger, nil
 }
